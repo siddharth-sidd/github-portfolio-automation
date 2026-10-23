@@ -1,0 +1,50 @@
+name: Daily portfolio review
+
+on:
+  schedule:
+    - cron: "30 4 * * *" # 10:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: daily-portfolio-review
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out controller
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run selector tests
+        run: python -m unittest discover -s tests -v
+      - name: Generate task
+        id: task
+        run: |
+          python scripts/select_task.py --date "$(date -u +%F)" > daily-task.md
+          {
+            echo 'body<<TASK_EOF'
+            cat daily-task.md
+            echo 'TASK_EOF'
+          } >> "$GITHUB_OUTPUT"
+      - name: Open review task
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TASK_BODY: ${{ steps.task.outputs.body }}
+        run: |
+          gh issue create \
+            --title "Daily portfolio review — $(date -u +%F)" \
+            --body "$TASK_BODY" \
+            --label "automation-review" || {
+              echo "Could not create issue (the label may not exist yet). Retrying without label."
+              gh issue create --title "Daily portfolio review — $(date -u +%F)" --body "$TASK_BODY"
+            }
