@@ -26,21 +26,10 @@ jobs:
           python-version: "3.12"
       - name: Run selector tests
         run: python -m unittest discover -s tests -v
-      - name: Generate proposal prompt
-        id: task
-        run: |
-          python scripts/select_task.py --date "$(date -u +%F)" --biweekly > project-proposal.md
-          {
-            echo 'body<<TASK_EOF'
-            cat project-proposal.md
-            echo 'TASK_EOF'
-          } >> "$GITHUB_OUTPUT"
-      - name: Open project proposal issue
+      - name: Generate and open project proposal
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TASK_BODY: ${{ steps.task.outputs.body }}
         run: |
-          gh issue create \
-            --title "Biweekly new-project proposal — $(date -u +%F)" \
-            --body "$TASK_BODY"
+          python scripts/select_task.py --date "$(date -u +%F)" --biweekly > project-proposal.md
+          gh issue create --title "Biweekly new-project proposal — $(date -u +%F)" --body-file project-proposal.md
