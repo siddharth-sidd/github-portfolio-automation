@@ -1,0 +1,46 @@
+name: Biweekly project proposal
+
+on:
+  schedule:
+    - cron: "30 4 1-7,15-21 * 1" # Mondays in week 1 and 3, 10:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: biweekly-project-proposal
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out controller
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run selector tests
+        run: python -m unittest discover -s tests -v
+      - name: Generate proposal prompt
+        id: task
+        run: |
+          python scripts/select_task.py --date "$(date -u +%F)" --biweekly > project-proposal.md
+          {
+            echo 'body<<TASK_EOF'
+            cat project-proposal.md
+            echo 'TASK_EOF'
+          } >> "$GITHUB_OUTPUT"
+      - name: Open project proposal issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TASK_BODY: ${{ steps.task.outputs.body }}
+        run: |
+          gh issue create \
+            --title "Biweekly new-project proposal — $(date -u +%F)" \
+            --body "$TASK_BODY"
