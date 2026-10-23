@@ -1,0 +1,29 @@
+{
+  "timezone": "Asia/Kolkata",
+  "repositories": [
+    {
+      "full_name": "siddharth-sidd/daily-task-tracker",
+      "stacks": ["React", "TypeScript", "Tailwind CSS", "Node.js", "Express", "testing"],
+      "focus_areas": ["task workflows", "accessibility", "validation", "API reliability", "tests", "documentation"]
+    },
+    {
+      "full_name": "siddharth-sidd/dailytracker",
+      "stacks": ["web development", "JavaScript", "database"],
+      "focus_areas": ["bug fixes", "maintainability", "validation", "tests", "documentation"]
+    },
+    {
+      "full_name": "siddharth-sidd/hr-outreach-automation",
+      "stacks": ["automation", "Python", "web APIs"],
+      "focus_areas": ["input validation", "error handling", "privacy", "tests", "documentation"]
+    }
+  ],
+  "policy": {
+    "mode": "review-only",
+    "allow_direct_push": false,
+    "allow_auto_merge": false,
+    "allow_auto_deploy": false,
+    "allow_create_repository": false,
+    "skip_if_no_meaningful_task": true,
+    "max_files_per_proposal": 8
+  }
+}
