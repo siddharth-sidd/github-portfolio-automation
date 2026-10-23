@@ -28,11 +28,15 @@ class SelectorTests(unittest.TestCase):
         self.assertIn("review-only", first)
         self.assertIn("pull request", first.lower())
 
-    def test_selector_rotates_across_adjacent_days(self):
-        first = self.run_script("--date", "2026-10-24")
-        second = self.run_script("--date", "2026-10-25")
-        self.assertNotEqual(first.split("**Target repository:** `", 1)[1].split("`", 1)[0],
-                            second.split("**Target repository:** `", 1)[1].split("`", 1)[0])
+    def test_selector_rotates_across_full_configured_cycle(self):
+        start = date(2026, 10, 24)
+        count = len(CONFIG["repositories"])
+        selections = [
+            self.run_script("--date", date.fromordinal(start.toordinal() + offset).isoformat())
+            for offset in range(count)
+        ]
+        names = [s.split("**Target repository:** `", 1)[1].split("`", 1)[0] for s in selections]
+        self.assertEqual(len(set(names)), count)
 
     def test_biweekly_proposal_never_authorizes_repo_creation(self):
         proposal = self.run_script("--date", "2026-10-26", "--biweekly")
