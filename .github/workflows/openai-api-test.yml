@@ -1,5 +1,4 @@
-
-name: OpenAI API connection test
+name: Gemini API connection test
 
 on:
   workflow_dispatch:
@@ -8,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  test-openai:
+  test-gemini:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -21,23 +20,25 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install OpenAI dependency
-        run: python -m pip install -r requirements.txt
+      - name: Install Google GenAI SDK
+        run: python -m pip install google-genai
 
-      - name: Test OpenAI API connection
+      - name: Test Gemini API connection
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python - <<'PY'
           import os
-          from openai import OpenAI
+          from google import genai
 
-          client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
-          response = client.responses.create(
-              model="gpt-4.1",
-              input="Reply with exactly: OpenAI API connection successful"
+          client = genai.Client(
+              api_key=os.environ["GEMINI_API_KEY"]
           )
 
-          print(response.output_text)
+          response = client.models.generate_content(
+              model="gemini-2.5-flash",
+              contents="Reply with exactly: Gemini API connection successful"
+          )
+
+          print(response.text)
           PY
