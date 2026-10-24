@@ -1,3 +1,4 @@
+
 {
   "timezone": "Asia/Kolkata",
   "repositories": [
@@ -18,8 +19,8 @@
     }
   ],
   "policy": {
-    "mode": "review-only",
-    "allow_direct_push": false,
+    "mode": "automated",
+    "allow_direct_push": true,
     "allow_auto_merge": false,
     "allow_auto_deploy": false,
     "allow_create_repository": false,
